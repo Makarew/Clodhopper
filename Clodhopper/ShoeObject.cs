@@ -35,6 +35,8 @@ namespace Clodhopper
             trigger.onInteract.AddListener(SwitchShoesToThis);
             trigger.onInteractEarly = new InteractEvent();
             trigger.onStopInteract = new InteractEvent();
+
+            trigger.hoverIcon = FindObjectOfType<UnlockableSuit>().gameObject.GetComponent<InteractTrigger>().hoverIcon;
         }
 
         // When Interacting With Shoe Object

@@ -14,5 +14,39 @@ namespace Clodhopper
         public List<GameObject> shoesRight;
 
         public string enabledShoe = "Default";
+
+        public bool showShoes = true;
+
+        // Toggle Local Player Shoe Visibility
+        public void ToggleLocalPlayerShoes()
+        {
+            if (showShoes)
+            {
+                foreach (var sho in shoesLeft)
+                {
+                    sho.SetActive(false);
+                }
+                foreach (var sho in shoesRight)
+                {
+                    sho.SetActive(false);
+                }
+
+                showShoes = false;
+            } else
+            {
+                foreach (var sho in shoesLeft)
+                {
+                    if (sho.GetComponent<ShoeObject>().shoeID == enabledShoe) { sho.SetActive(true); }
+                    else { sho.SetActive(false); }
+                }
+                foreach (var sho in shoesRight)
+                {
+                    if (sho.GetComponent<ShoeObject>().shoeID == enabledShoe) { sho.SetActive(true); }
+                    else { sho.SetActive(false); }
+                }
+
+                showShoes = true;
+            }
+        }
     }
 }

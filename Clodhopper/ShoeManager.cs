@@ -18,13 +18,13 @@ namespace Clodhopper
         // Set Instance
         private void Awake()
         {
-            if (ShoeManager.Instance == null) ShoeManager.Instance = this;
+            if (ShoeManager.Instance == null) { ShoeManager.Instance = this; DontDestroyOnLoad(this); }
         }
 
         // Load All Shoe Asset Bundles
         public void LoadShoes()
         {
-            string[] paths = Directory.GetFiles(Path.Combine(Paths.PluginPath, "Makarew-Clodhopper", "ShoeBundles"), "*.shoe", SearchOption.AllDirectories);
+            string[] paths = Directory.GetFiles(Path.Combine(Paths.PluginPath), "*.shoe", SearchOption.AllDirectories);
 
             foreach (string path in paths)
             {

@@ -14,17 +14,13 @@ namespace Clodhopper
     {
         public static void Init()
         {
-            Plugin.Instance.SendLog("Patching");
-
             // Load Shoe Models When A New Player Joins By Any Means Necessary
             Harmony harmony = new Harmony("ShoePatcher");
             MethodInfo sorClientCon = AccessTools.Method(typeof(PlayerControllerB), "ConnectClientToPlayerObject");
             MethodInfo shoeClientPatch = AccessTools.Method(typeof(Patcher), nameof(Patcher.AttachAllShoes));
-            MethodInfo sorAwake = AccessTools.Method(typeof(StartOfRound), "Start");
             MethodInfo playerJoined = AccessTools.Method(typeof(StartOfRound), "OnPlayerConnectedClientRpc");
 
             harmony.Patch(sorClientCon,null, new HarmonyMethod(shoeClientPatch));
-            harmony.Patch(sorAwake,null, new HarmonyMethod(shoeClientPatch));
             harmony.Patch(playerJoined, null, new HarmonyMethod(shoeClientPatch));
 
             // Check If The Chat Message Is For Clodhopper
@@ -44,8 +40,6 @@ namespace Clodhopper
             MethodInfo init = AccessTools.Method(typeof(PreInitSceneScript), "Awake");
 
             harmony.Patch(init, new HarmonyMethod(initPatch));
-
-            Plugin.Instance.SendLog("Patched");
         }
 
         public static void AddShoes(Transform parentObj)
@@ -103,11 +97,13 @@ namespace Clodhopper
                 ulong playerID = ulong.Parse(chatMessage.Split(';')[2]);
 
                 Transform player = null;
+                bool localPlayer = false;
 
                 // Check If The Local Player Sent The Message
                 if (StartOfRound.Instance.localPlayerController.NetworkObjectId == playerID)
                 {
                     player = StartOfRound.Instance.localPlayerController.transform;
+                    localPlayer = true;
                 }
                 else
                 {
@@ -119,10 +115,14 @@ namespace Clodhopper
                 }
 
                 // Do Nothing If The Player Has The Current Shoe Enabled Already
-                if (player.Find("ScavengerModel/metarig/spine").GetComponent<ShoeSpawner>().enabledShoe == shoeID) return false;
+                if (player.Find("ScavengerModel/metarig/spine").GetComponent<ShoeSpawner>().enabledShoe == shoeID || (localPlayer && !player.Find("ScavengerModel/metarig/spine").GetComponent<ShoeSpawner>().showShoes))
+                {
+                    player.Find("ScavengerModel/metarig/spine").GetComponent<ShoeSpawner>().enabledShoe = shoeID;
+                    return false;
+                }
 
-                // Disable All Shoes On The Left Foot, And Enable The Requested Shoe
-                foreach (GameObject shoes in player.Find("ScavengerModel/metarig/spine").GetComponent<ShoeSpawner>().shoesLeft)
+                    // Disable All Shoes On The Left Foot, And Enable The Requested Shoe
+                    foreach (GameObject shoes in player.Find("ScavengerModel/metarig/spine").GetComponent<ShoeSpawner>().shoesLeft)
                 {
                     if (shoes.GetComponent<ShoeObject>().shoeID == shoeID) { shoes.SetActive(true); }
                     else { shoes.SetActive(false); }
