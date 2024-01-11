@@ -122,6 +122,8 @@ namespace Clodhopper
         // Toggle Local Player Shoe Visibility
         public static void ToggleEvent(InputAction.CallbackContext context)
         {
+            if (!Plugin.Instance.CheckIfCanUseHotkey()) return;
+
             Instance.Logger.LogMessage("Toggling Local Player Shoe Visibility");
             StartOfRound.Instance.localPlayerController.transform.Find("ScavengerModel/metarig/spine").GetComponent<ShoeSpawner>().ToggleLocalPlayerShoes();
         }
@@ -129,7 +131,22 @@ namespace Clodhopper
         // Remove Local Player Shoes
         public static void RemoveShoeEvent(InputAction.CallbackContext context)
         {
+            if (!Plugin.Instance.CheckIfCanUseHotkey()) return;
+
             HUDManager.Instance.AddTextToChatOnServer("Clodhopper Custom RPC Send Custom Message Shoe Type;Default;" + StartOfRound.Instance.localPlayerController.NetworkObjectId);
+        }
+
+        // Disable Hot Keys If The Player Is Not Controlling The Character
+        public bool CheckIfCanUseHotkey()
+        {
+            PlayerControllerB player = StartOfRound.Instance.localPlayerController;
+
+            if (player.inTerminalMenu || player.isFreeCamera || player.isPlayerDead || player.isTypingChat || GameObject.FindObjectOfType<QuickMenuManager>().isMenuOpen)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
