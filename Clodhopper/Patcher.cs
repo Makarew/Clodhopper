@@ -64,6 +64,10 @@ namespace Clodhopper
                 left.tag = "Untagged";
                 left.layer = 0;
 
+                // Disable Collision For Wearable Shoes
+                right.GetComponent<BoxCollider>().enabled = false;
+                left.GetComponent<BoxCollider>().enabled = false;
+
                 right.SetActive(false);
                 left.SetActive(false);
             }
